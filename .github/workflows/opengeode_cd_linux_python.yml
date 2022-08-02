@@ -1,0 +1,57 @@
+on: 
+  workflow_call:
+    inputs:
+      name:
+        type: string
+        required: true
+      directory:
+        type: string
+        default: "."
+      repos:
+        type: string
+    secrets:
+      TOKEN:
+        required: true
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    container: "ghcr.io/geode-solutions/centos:master"
+    strategy:
+      matrix:
+        config:
+        - {python: "3.7", tag: "cp37-cp37m"}
+        - {python: "3.8", tag: "cp38-cp38"}
+        #- {python: "3.9", tag: "cp39-cp39"}
+        #- {python: "3.10", tag: "cp310-cp310"}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: Geode-solutions/actions/get-release@master
+      id: repos
+      with:
+        repository: ${{ inputs.repos }}
+        file: '-rhel-private.tar.gz'
+        token: ${{ secrets.TOKEN }}
+    - name: Libraries
+      id: libraries
+      run: |
+        new_path=$(echo "${{ steps.repos.outputs.path }}" | sed 's/\;/\/lib64\:/g')
+        echo "LD_LIBRARY_PATH=$new_path" >> $GITHUB_ENV
+    - name: Compile
+      run: |
+        export PATH=/opt/python/${{ matrix.config.tag }}/bin:$PATH
+        mkdir -p build
+        cd build
+        version="${GITHUB_REF##*/*/v}"
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH:PATH="${{ steps.repos.outputs.path }}" -D${{ inputs.name }}_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} -DWHEEL_VERSION:STRING=$version ..
+        cmake --build . -j 2
+        cd ${{ inputs.directory }}
+        cmake --build . --target wheel --config Release
+        cd wheel/dist
+        rename linux manylinux2014 *.whl
+    - name: Upload
+      uses: geode-solutions/action-gh-release@master
+      with:
+        files: build/${{ inputs.directory }}/wheel/dist/*.whl
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}

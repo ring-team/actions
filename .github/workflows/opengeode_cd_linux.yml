@@ -1,0 +1,54 @@
+on: 
+  workflow_call:
+    inputs:
+      name:
+        type: string
+        required: true
+      directory:
+        type: string
+        default: "."
+      repos:
+        type: string
+    secrets:
+      TOKEN:
+        required: true
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    container: ${{ matrix.config.container }}
+    strategy:
+      matrix:
+        config:
+        - {container: "ghcr.io/geode-solutions/ubuntu:master", system: "ubuntu", doc: true, lib: "lib"}
+        #- {container: "ghcr.io/geode-solutions/centos:master", system: "rhel", doc: false, lib: "lib64"}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: Geode-solutions/actions/get-release@master
+      id: repos
+      with:
+        repository: ${{ inputs.repos }}
+        file: '-${{ matrix.config.system }}-private.tar.gz'
+        token: ${{ secrets.TOKEN }}
+    - name: Libraries
+      id: libraries
+      run: |
+        new_path=$(echo "${{ steps.repos.outputs.path }}" | sed 's/\;/\/${{ matrix.config.lib }}\:/g')
+        echo "LD_LIBRARY_PATH=$new_path" >> $GITHUB_ENV
+    - name: Generate package
+      run: |
+        mkdir -p build
+        cd build
+        version="${GITHUB_REF##*/*/v}"
+        echo ::set-output name=version::$version
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ steps.repos.outputs.path }}" -D${{ inputs.name }}_WITH_TESTS:BOOL=OFF -DINCLUDE_PYBIND11:BOOL=ON -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING=${{ matrix.config.system }} ..
+        cmake --build . -j 2
+        cpack -D CPACK_COMPONENTS_ALL="public;private" .
+        for i in *.tar.gz; do mv $i $(echo $i | sed 's/\.tar\.gz/\-private\.tar\.gz/g'); done
+        cmake --build . --target package
+      - name: Upload
+      uses: geode-solutions/action-gh-release@master
+      with:
+        files: build/*.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
