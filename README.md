@@ -1,2 +1,2 @@
-# my_actions
-define shared actions and workflows.
+# actions
+Define shared actions and workflows for CI/CD.
