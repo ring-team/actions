@@ -16,7 +16,7 @@ jobs:
         cd build
         $version = ${env:GITHUB_REF} -replace 'refs\/tags\/v', ''
         echo "::set-output name=version::$version"
-        cmake -G "Visual Studio 16 2019" -A x64 -D_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING=win64 ..
+        cmake -G "Visual Studio 16 2019" -A x64 -DWITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING=win64 ..
         cmake --build . --config Release -j 2
         cmake --build . --target PACKAGE --config Release
     - name: Upload
