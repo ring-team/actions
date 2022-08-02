@@ -1,0 +1,27 @@
+on: 
+  workflow_call:
+    secrets:
+      TOKEN:
+        required: true
+
+jobs:
+  run:
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v3
+    - name: Generate package
+      run: |
+        choco install openssl -r --no-progress
+        if(!(test-path build)) { mkdir build }
+        cd build
+        $version = ${env:GITHUB_REF} -replace 'refs\/tags\/v', ''
+        echo "::set-output name=version::$version"
+        cmake -G "Visual Studio 16 2019" -A x64 -D_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING=win64 ..
+        cmake --build . --config Release -j 2
+        cmake --build . --target PACKAGE --config Release
+    - name: Upload
+      uses: geode-solutions/action-gh-release@master
+      with:
+        files: build/*.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}

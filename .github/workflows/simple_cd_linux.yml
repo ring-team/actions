@@ -1,0 +1,26 @@
+on: 
+  workflow_call:
+    secrets:
+      TOKEN:
+        required: true
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Generate package
+      run: |
+        mkdir -p build
+        cd build
+        version="${GITHUB_REF##*/*/v}"
+        echo ::set-output name=version::$version
+        cmake -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING="ubuntu" ..
+        cmake --build . -j 2
+        cmake --build . --target package
+    - name: Upload
+      uses: geode-solutions/action-gh-release@master
+      with:
+        files: build/*.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}

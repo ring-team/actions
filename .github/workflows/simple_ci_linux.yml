@@ -1,0 +1,19 @@
+on: 
+  workflow_call:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        config: [Debug, Release]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Compile & Test
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config }} ..
+        cmake --build . -j 2
+        ctest -C ${{ matrix.config }} --output-on-failure
+  
