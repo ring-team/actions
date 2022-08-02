@@ -46,7 +46,7 @@ jobs:
         cpack -D CPACK_COMPONENTS_ALL="public;private" .
         for i in *.tar.gz; do mv $i $(echo $i | sed 's/\.tar\.gz/\-private\.tar\.gz/g'); done
         cmake --build . --target package
-      - name: Upload
+    - name: Upload
       uses: geode-solutions/action-gh-release@master
       with:
         files: build/*.tar.gz

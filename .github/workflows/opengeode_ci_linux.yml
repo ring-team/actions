@@ -40,8 +40,6 @@ jobs:
         cmake --build . -j 2
         cd ${{ inputs.directory }}        
         ctest --output-on-failure -j 2
-      env:
-        GEODE_LICENSE_LOCATION: ${{ github.workspace }}/geode.lic
     - name: Test
       run: |
         mkdir -p test
@@ -49,5 +47,3 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH:PATH="${{ steps.repos.outputs.path }};$GITHUB_WORKSPACE/build/${{ inputs.directory }}/install;$GITHUB_WORKSPACE/build" ../tests
         cmake --build . -j 2
         ctest --output-on-failure -j 2
-      env:
-        GEODE_LICENSE_LOCATION: ${{ github.workspace }}/geode.lic
