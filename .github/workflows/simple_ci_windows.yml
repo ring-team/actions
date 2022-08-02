@@ -1,0 +1,19 @@
+on: 
+  workflow_call:
+
+jobs:
+  run:
+    runs-on: windows-2019
+    strategy:
+      matrix:
+        config: [Debug, Release]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Compile & Test
+      run: |
+        mkdir -p build
+        cd build
+        cmake -G "Visual Studio 16 2019" -A x64 ..
+        cmake --build . --config ${{ matrix.config }}
+        ctest -C ${{ matrix.config }} --output-on-failure
+  
