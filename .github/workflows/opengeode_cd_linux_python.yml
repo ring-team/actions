@@ -9,8 +9,6 @@ on:
         default: "."
       repos:
         type: string
-      owner:
-        type: string
     secrets:
       TOKEN:
         required: true
@@ -27,12 +25,16 @@ jobs:
         #- {python: "3.9", tag: "cp39-cp39"}
         #- {python: "3.10", tag: "cp310-cp310"}
     steps:
+    - ownername: 
+      if: ${{ inputs.repos == 'OpenGeode-FractModel' }}
+      run: |
+        repoowner=$(echo "ring-team")
     - uses: actions/checkout@v3
     - uses: Geode-solutions/actions/get-release@master
       id: repos
       with:
         repository: ${{ inputs.repos }}
-        owner: ${{ inputs.owner }}
+        owner: ${{ repoowner }}
         file: '-rhel-private.tar.gz'
         token: ${{ secrets.TOKEN }}
     - name: Libraries
