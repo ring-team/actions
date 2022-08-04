@@ -9,6 +9,8 @@ on:
         default: "."
       repos:
         type: string
+      owner:
+        type: string
     secrets:
       TOKEN:
         required: true
@@ -30,6 +32,7 @@ jobs:
       id: repos
       with:
         repository: ${{ inputs.repos }}
+        owner: ${{ inputs.owner }}
         file: '-rhel-private.tar.gz'
         token: ${{ secrets.TOKEN }}
     - name: Libraries
