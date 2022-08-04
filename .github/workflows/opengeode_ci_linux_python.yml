@@ -9,6 +9,8 @@ on:
         default: "."
       repos:
         type: string
+      owner:
+        type: string
     secrets:
       TOKEN:
         required: true
