@@ -9,6 +9,7 @@ on:
         default: "."
       repos:
         type: string
+        description: repos/owner
     secrets:
       TOKEN:
         required: true
@@ -28,8 +29,8 @@ jobs:
     - uses: Geode-solutions/actions/get-release@master
       id: repos
       with:
-        repository: ${{ inputs.repos }}
-        owner: ring-team
+        repository: $(echo ${{ inputs.repos }}| cut -d'/' -f 1)
+        owner: $(echo ${{ inputs.repos }}| cut -d'/' -f 2)
         file: '-win64-private.zip'
         token: ${{ secrets.TOKEN }}
     - name: Libraries
