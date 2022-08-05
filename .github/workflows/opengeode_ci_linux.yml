@@ -6,7 +6,6 @@ on:
         default: "."
       repos:
         type: string
-        description: repos/owner
     secrets:
       TOKEN:
         required: true
@@ -21,20 +20,20 @@ jobs:
         - {container: "ghcr.io/geode-solutions/ubuntu:master", system: "ubuntu", lib: "lib"}
         #- {container: "ghcr.io/geode-solutions/centos:master", system: "rhel", lib: "lib64"}
     steps:
-    - name: RepoOwner
-      id: reposowner
-      run: |
-        echo ${{ inputs.repos }}
-        repo_name=$(echo "${{ inputs.repos }}"| cut -d'/' -f 1)
-        echo $repo_name
-        repos_owner=$(echo "${{ inputs.repos }}"| cut -d'/' -f 2)
-        echo $repos_owner
     - uses: actions/checkout@v3
     - uses: Geode-solutions/actions/get-release@master
       id: repos
       with:
-        repository: $repo_name
-        owner: $repos_owner
+        repository: ${{ inputs.repos }}
+        file: '-${{ matrix.config.system }}-private.tar.gz'
+        token: ${{ secrets.TOKEN }}
+    - name: My backup step
+      if: ${{ failure() }}
+      uses: Geode-solutions/actions/get-release@master
+      id: repos
+      with:
+        repository: ${{ inputs.repos }}
+        owner: ring-team
         file: '-${{ matrix.config.system }}-private.tar.gz'
         token: ${{ secrets.TOKEN }}
     - name: Libraries
