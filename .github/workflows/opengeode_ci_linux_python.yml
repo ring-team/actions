@@ -32,6 +32,7 @@ jobs:
       id: repos
       with:
         repository: ${{ inputs.repos }}
+        owner: ring-team
         file: '-rhel-private.tar.gz'
         token: ${{ secrets.TOKEN }}
     - name: Libraries

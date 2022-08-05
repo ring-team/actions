@@ -22,6 +22,7 @@ jobs:
       id: repos
       with:
         repository: ${{ inputs.repos }}
+        owner: ring-team
         file: '-win64-private.zip'
         token: ${{ secrets.TOKEN }}
     - name: Generate package
