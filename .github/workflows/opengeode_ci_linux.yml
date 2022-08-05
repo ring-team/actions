@@ -20,23 +20,26 @@ jobs:
         config:
         - {container: "ghcr.io/geode-solutions/ubuntu:master", system: "ubuntu", lib: "lib"}
         #- {container: "ghcr.io/geode-solutions/centos:master", system: "rhel", lib: "lib64"}
+    env:
+      repo_name: "b"
+      repos_owner: "b"
     steps:
     - name: RepoOwner
       id: reposowner
       run: |
         echo ${{ inputs.repos }}
-        repo_name=$(echo "${{ inputs.repos }}"| cut -d'/' -f 1)
+        $repo_name=$(echo "${{ inputs.repos }}"| cut -d'/' -f 1)
         echo ${{ inputs.repos }}
-        echo ${{ repo_name }}
-        repos_owner=$(echo "${{ inputs.repos }}"| cut -d'/' -f 2)
+        echo $repo_name
+        $repos_owner=$(echo "${{ inputs.repos }}"| cut -d'/' -f 2)
         echo ${{ inputs.repos }}
-        echo ${{repos_owner }}
+        echo $repos_owner
     - uses: actions/checkout@v3
     - uses: Geode-solutions/actions/get-release@master
       id: repos
       with:
-        repository: ${{ steps.reposowner.repo_name }}
-        owner: ${{ steps.reposowner.repos_owner }}
+        repository: $repo_name
+        owner: $repos_owner
         file: '-${{ matrix.config.system }}-private.tar.gz'
         token: ${{ secrets.TOKEN }}
     - name: Libraries
