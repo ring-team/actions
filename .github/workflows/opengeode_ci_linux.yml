@@ -27,10 +27,8 @@ jobs:
         repository: ${{ inputs.repos }}
         file: '-${{ matrix.config.system }}-private.tar.gz'
         token: ${{ secrets.TOKEN }}
-    - name: My backup step
       if: ${{ failure() }}
       uses: Geode-solutions/actions/get-release@master
-      id: repos
       with:
         repository: ${{ inputs.repos }}
         owner: ring-team
