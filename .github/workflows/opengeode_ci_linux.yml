@@ -24,6 +24,7 @@ jobs:
     - uses: Geode-solutions/actions/get-release@master
       id: repos
       with:
+        owner: ring-team
         repository: ${{ inputs.repos }}
         owner: ring-team
         file: '-${{ matrix.config.system }}-private.tar.gz'
