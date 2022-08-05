@@ -21,12 +21,17 @@ jobs:
         - {container: "ghcr.io/geode-solutions/ubuntu:master", system: "ubuntu", lib: "lib"}
         #- {container: "ghcr.io/geode-solutions/centos:master", system: "rhel", lib: "lib64"}
     steps:
+    - name: RepoOwner
+      id: reposowner
+      run: |
+        repo_name = $(echo ${{ inputs.repos }}| cut -d'/' -f 1)
+        repos_owner = $(echo ${{ inputs.repos }}| cut -d'/' -f 2)
     - uses: actions/checkout@v3
     - uses: Geode-solutions/actions/get-release@master
       id: repos
       with:
-        repository: $(echo ${{ inputs.repos }}| cut -d'/' -f 1)
-        owner: $(echo ${{ inputs.repos }}| cut -d'/' -f 2)
+        repository: ${{ steps.reposowner.repo_name }}
+        owner: ${{ steps.reposowner.repos_owner }}
         file: '-${{ matrix.config.system }}-private.tar.gz'
         token: ${{ secrets.TOKEN }}
     - name: Libraries

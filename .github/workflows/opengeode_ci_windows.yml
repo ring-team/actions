@@ -21,6 +21,11 @@ jobs:
       matrix:
         python: ["3.7", "3.8"]
     steps:
+    - name: RepoOwner
+      id: reposowner
+      run: |
+        repo_name = $(echo ${{ inputs.repos }}| cut -d'/' -f 1)
+        repos_owner = $(echo ${{ inputs.repos }}| cut -d'/' -f 2)
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v3
@@ -29,8 +34,8 @@ jobs:
     - uses: Geode-solutions/actions/get-release@master
       id: repos
       with:
-        repository: $(echo ${{ inputs.repos }}| cut -d'/' -f 1)
-        owner: $(echo ${{ inputs.repos }}| cut -d'/' -f 2)
+        repository: ${{ steps.reposowner.repo_name }}
+        owner: ${{ steps.reposowner.repos_owner }}
         file: '-win64-private.zip'
         token: ${{ secrets.TOKEN }}
     - name: Libraries
