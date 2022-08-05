@@ -27,13 +27,6 @@ jobs:
         repository: ${{ inputs.repos }}
         file: '-${{ matrix.config.system }}-private.tar.gz'
         token: ${{ secrets.TOKEN }}
-      if: ${{ failure() }}
-      uses: Geode-solutions/actions/get-release@master
-      with:
-        repository: ${{ inputs.repos }}
-        owner: ring-team
-        file: '-${{ matrix.config.system }}-private.tar.gz'
-        token: ${{ secrets.TOKEN }}
     - name: Libraries
       id: libraries
       run: |

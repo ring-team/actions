@@ -9,7 +9,6 @@ on:
         default: "."
       repos:
         type: string
-        description: repos/owner
     secrets:
       TOKEN:
         required: true
@@ -26,17 +25,11 @@ jobs:
        # - {python: "3.9", tag: "cp39-cp39"}
        # - {python: "3.10", tag: "cp310-cp310"}
     steps:
-    - name: RepoOwner
-      id: reposowner
-      run: |
-        repo_name=$(echo ${{ inputs.repos }}| cut -d'/' -f 1)
-        repos_owner=$(echo ${{ inputs.repos }}| cut -d'/' -f 2)
     - uses: actions/checkout@v3
     - uses: Geode-solutions/actions/get-release@master
       id: repos
       with:
-        repository: ${{ steps.reposowner.repo_name }}
-        owner: ${{ steps.reposowner.repos_owner }}
+        repository: ${{ inputs.repos }}
         file: '-rhel-private.tar.gz'
         token: ${{ secrets.TOKEN }}
     - name: Libraries
