@@ -24,8 +24,13 @@ jobs:
     - name: RepoOwner
       id: reposowner
       run: |
+        echo ${{ inputs.repos }}
         repo_name=$(echo ${{ inputs.repos }}| cut -d'/' -f 1)
+        echo ${{ inputs.repos }}
+        echo ${{ repo_name }}
         repos_owner=$(echo ${{ inputs.repos }}| cut -d'/' -f 2)
+        echo ${{ inputs.repos }}
+        echo ${{repos_owner }}
     - uses: actions/checkout@v3
     - uses: Geode-solutions/actions/get-release@master
       id: repos
