@@ -1,9 +1,5 @@
 on: 
-  workflow_call:
-    secrets:
-      TOKEN:
-        required: true
-
+  push
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -14,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.TOKEN }}
     - name: "Get file config"
       run: |
         curl -H "Accept: application/vnd.github.VERSION.raw" https://api.github.com/repos/Geode-solutions/actions/contents/.clang-format\?ref\=master > .clang-format
